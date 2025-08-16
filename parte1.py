@@ -13,7 +13,8 @@ plt.xlabel("X")
 plt.ylabel("Y")
 plt.grid(True)
 plt.legend()
-plt.title("Ponto inicial e final ")
+plt.title("Ponto inicial e FINAL ")
+
 
 # Salvando o gráfico
 grafico = "grafico.png"
