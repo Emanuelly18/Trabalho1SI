@@ -114,7 +114,7 @@ while start:
     pygame.draw.rect(janela, (0,255,127), (0,0,largura,altura),5)
     
     if inputA:
-        instrucao = fonte.render("Digite a quantidade de círculos e pressione ENTER:", True, (255,255,255))
+        instrucao = fonte.render("Digite a quantidade de obstáculos e pressione ENTER:", True, (255,255,255))
         janela.blit(instrucao, (50, altura//2 - 50))
         
         entrada = fonte.render(inputD, True, (0,255,0))
