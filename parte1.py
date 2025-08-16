@@ -14,6 +14,7 @@ plt.ylabel("Y")
 plt.grid(True)
 plt.legend()
 plt.title("Ponto inicial e FINAL ")
+print("OLA")
 
 
 # Salvando o gráfico
