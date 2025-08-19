@@ -6,7 +6,7 @@ pygame.init()
 
 # tamanho inicial da janela
 largura = 800
-altura = 600
+altura = 400
 janela = pygame.display.set_mode((largura, altura))
 margem = 40
 fonte = pygame.font.SysFont(None, 30)
@@ -22,51 +22,73 @@ distanciaMinima = 30
 tentativasMAX = 20
 
 # limites máximos de tela e raio
-larguraMax = 1600
-alturaMax = 1200
-raio = 30   # raio fixo
+larguraMax = 1500
+alturaMax = 750
+raio = 30   
 
 
 # input para a quantidade de obstaculos
 inputA = True
 inputD = ""
 
+pontoInicial, pontoFinal = (margem, margem), (largura - margem, altura - margem)
+
+def atualizarPontos():
+    global pontoInicial, pontoFinal
+    pontoInicial = (margem, margem)
+    pontoFinal = (largura - margem, altura - margem)
+
 def distancia(p1, p2):
     return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
 
 def gerarObstaculos(quantidade, raio):
     global largura, altura, janela
-    novos = []
-    
-    while len(novos) < quantidade:
-        tentativas = 0
-        inserido = False
+    while raio >= 2:
+        novos = []
         
-        while tentativas < tentativasMAX and not inserido:
-            x = random.randint(margem + raio, largura - margem - raio)
-            y = random.randint(margem + raio, altura - margem - raio)
-            pos = (x, y)
+        while len(novos) < quantidade:
+            tentativas = 0
+            inserido = False
             
-            valido = True
-            for o in novos:
-                if distancia(pos, o["pos"]) < (2*raio + distanciaMinima):
+            while tentativas < tentativasMAX and not inserido:
+                x = random.randint(margem + raio, largura - margem - raio)
+                y = random.randint(margem + raio, altura - margem - raio)
+                pos = (x, y)
+                
+                valido = True
+                for o in novos:
+                    if distancia(pos, o["pos"]) < (2*raio + distanciaMinima):
+                        valido = False
+                        break
+                    
+                seguro = raio + 30  
+                if distancia(pos, pontoInicial) < seguro or distancia(pos, pontoFinal) < seguro:
                     valido = False
-                    break
-            if valido:
-                novos.append({"pos": pos, "raio": raio, "cor": corObstaculo})
-                inserido = True
-            else:
-                tentativas += 1
-        
-        # se não conseguiu inserir
-        if not inserido:
-            if largura < larguraMax and altura < alturaMax:
-                largura += 100
-                altura += 100
-                janela = pygame.display.set_mode((largura, altura))
-            else:
-                break  # não tem mais o que fazer
+                    
+                if valido:
+                    novos.append({"pos": pos, "raio": raio, "cor": corObstaculo})
+                    inserido = True
+                else:
+                    tentativas += 1
+            
+            # se não conseguiu inserir
+            if not inserido:
+                # aumenta a tela
+                if largura < larguraMax and altura < alturaMax:
+                    largura += 100
+                    altura += 50
+                    janela = pygame.display.set_mode((largura, altura), pygame.RESIZABLE)
+                    atualizarPontos()
+                # chegou ao limite de tela
+                else:
+                    raio -= 1
+                    if raio < 2:  
+                        return novos, raio
+                    novos = []
+                    break  
 
+        if len(novos) == quantidade:
+            return novos, raio
     return novos, raio
 
 start = True
@@ -75,7 +97,7 @@ while start:
         if evento.type == pygame.QUIT:
             start = False
 
-        elif inputA:  # pede apenas a quantidade
+        elif inputA:  
             if evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_RETURN:
                     if inputD.isdigit():
@@ -90,8 +112,7 @@ while start:
     
     # cor da janela
     janela.fill((0,0,0))
-    # add borda
-    pygame.draw.rect(janela, (0,255,127), (0,0,largura,altura),5)
+    
     
     if inputA:
         instrucao = fonte.render("Digite a quantidade de obstáculos e pressione ENTER:", True, (255,255,255))
@@ -101,24 +122,22 @@ while start:
         
     else:
         # ponto de inicio e ponto final
-        pontoInicial = (margem, margem) 
         pygame.draw.circle(janela, (0,0,255), pontoInicial, 8)
         textoI = fonte.render("I", True, (255,255,255))
         rectI = textoI.get_rect(center=(pontoInicial[0], pontoInicial[1] - 20))
         janela.blit(textoI, rectI)
-        
-        pontoFinal = (largura - margem, altura - margem)
+
         pygame.draw.circle(janela, (255,0,0), pontoFinal, 8)
         textoF = fonte.render("F", True, (255,255,255))
         rectF = textoF.get_rect(center=(pontoFinal[0], pontoFinal[1] - 20))
         janela.blit(textoF, rectF)
+    
+    # gera obstaculos
+    for o in obstaculos:
+        pygame.draw.circle(janela, o["cor"], o["pos"], o["raio"])
         
-        # gera obstaculos
-        for o in obstaculos:
-            pygame.draw.circle(janela, o["cor"], o["pos"], o["raio"])
-            
-        textoQuant = fonte.render(f"Obstáculos: {len(obstaculos)} | Raio atual: {raio}", True, (255,255,255))
-        janela.blit(textoQuant, (largura - 350,10))
+    textoQuant = fonte.render(f"Obstáculos: {len(obstaculos)} | Raio atual: {raio}", True, (255,255,255))
+    janela.blit(textoQuant, (largura - 350,10))
         
     pygame.display.update()
     
