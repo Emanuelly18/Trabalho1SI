@@ -1,6 +1,30 @@
-# PARTE 1
+# Busca por um Caminho Ótimo
 
-## Instale o Pygame
+Este projeto tem como objetivo encontrar o caminho ótimo entre dois pontos fixos, traçando arestas do **ponto inicial (I)** até o **ponto final (F)**, desviando de obstáculos.
 
-```pip install pygame```
+## Parte 1 – Geração do Cenário
+
+- Definir dois pontos fixos:
+  - **I** → Ponto inicial  
+  - **F** → Ponto final  
+
+- Gerar obstáculos:
+  - Os obstáculos são **circunferências de raio fixo**, distribuídas aleatoriamente.  
+  - Não podem colidir entre si, nem com os pontos inicial e final.  
+
+- Inserção de obstáculos:
+  - O usuário informa a **quantidade de obstáculos** desejada.  
+  - O programa tenta posicioná-los no cenário:  
+    - Se não houver espaço, a **área da tela é aumentada** gradualmente até o limite máximo.  
+    - Caso o limite seja atingido e ainda não seja possível posicionar todos, o programa **reduz o raio dos obstáculos (-1 a cada tentativa)** até conseguir inserir todos ou até que o raio se torne inviável.  
+
+## 🚀 Requisitos
+
+- **Python 3.x**
+- **Pygame**
+
+Para instalar o Pygame, execute:
+
+```bash
+pip install pygame
 
