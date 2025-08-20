@@ -18,7 +18,8 @@ Este projeto tem como objetivo encontrar o caminho ótimo entre dois pontos fixo
     - Se não houver espaço, a **área da tela é aumentada** gradualmente até o limite máximo.  
     - Caso o limite seja atingido e ainda não seja possível posicionar todos, o programa **reduz o raio dos obstáculos (-1 a cada tentativa)** até conseguir inserir todos ou até que o raio se torne inviável.
 
-   
+---
+
   <img width="1495" height="786" alt="image" src="https://github.com/user-attachments/assets/f78d116a-ecc7-4ed6-97b0-dbc34342ba59" />
 
 
