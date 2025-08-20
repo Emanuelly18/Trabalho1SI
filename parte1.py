@@ -8,7 +8,7 @@ pygame.init()
 largura = 800
 altura = 400
 janela = pygame.display.set_mode((largura, altura))
-margem = 40
+margem = 20
 fonte = pygame.font.SysFont(None, 30)
 
 # titulo da janela
@@ -18,7 +18,7 @@ pygame.display.set_caption("Robozinho")
 obstaculos = []
 corObstaculo = (139,0,139)
 quantObstaculos = 0
-distanciaMinima = 30
+distanciaMinima = 0
 tentativasMAX = 20
 
 # limites máximos de tela e raio
@@ -51,8 +51,8 @@ def gerarObstaculos(quantidade, raio):
             inserido = False
             
             while tentativas < tentativasMAX and not inserido:
-                x = random.randint(margem + raio, largura - margem - raio)
-                y = random.randint(margem + raio, altura - margem - raio)
+                x = random.randint(raio, largura - raio)
+                y = random.randint(raio, altura - raio)
                 pos = (x, y)
                 
                 valido = True
