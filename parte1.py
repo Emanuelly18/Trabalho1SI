@@ -8,8 +8,8 @@ pygame.init()
 largura = 800
 altura = 400
 janela = pygame.display.set_mode((largura, altura))
-margem = 20
-fonte = pygame.font.SysFont(None, 30)
+margem = 30
+fonte = pygame.font.SysFont(None, 25)
 
 # titulo da janela
 pygame.display.set_caption("Robozinho")
@@ -26,10 +26,12 @@ larguraMax = 1500
 alturaMax = 750
 raio = 30   
 
-
 # input para a quantidade de obstaculos
 inputA = True
 inputD = ""
+
+# vertices dos obstaculos
+pontosObstaculos = [] 
 
 pontoInicial, pontoFinal = (margem, margem), (largura - margem, altura - margem)
 
@@ -103,6 +105,18 @@ while start:
                     if inputD.isdigit():
                         quantObstaculos = int(inputD)
                         obstaculos, raio = gerarObstaculos(quantObstaculos, raio)
+                        
+                        pontosObstaculos = [] 
+                        for o in obstaculos:
+                            x, y, r = o["pos"][0], o["pos"][1], o["raio"]
+                            pontos = [
+                                (x, y - r),  
+                                (x, y + r),  
+                                (x - r, y),  
+                                (x + r, y)   
+                            ]
+                            pontosObstaculos.append(pontos)
+                        
                         inputA = False
                 elif evento.key == pygame.K_BACKSPACE:
                     inputD = inputD[:-1]
@@ -127,14 +141,19 @@ while start:
         rectI = textoI.get_rect(center=(pontoInicial[0], pontoInicial[1] - 20))
         janela.blit(textoI, rectI)
 
-        pygame.draw.circle(janela, (255,0,0), pontoFinal, 8)
+        pygame.draw.circle(janela, (0,0,255), pontoFinal, 8)
         textoF = fonte.render("F", True, (255,255,255))
         rectF = textoF.get_rect(center=(pontoFinal[0], pontoFinal[1] - 20))
         janela.blit(textoF, rectF)
     
-    # gera obstaculos
+    # desenha obstaculos
     for o in obstaculos:
         pygame.draw.circle(janela, o["cor"], o["pos"], o["raio"])
+        
+    # desenha vertices
+    for pontos in pontosObstaculos:
+        for p in pontos:
+            pygame.draw.circle(janela, (139,0,0), p, 4)
         
     textoQuant = fonte.render(f"Obstáculos: {len(obstaculos)} | Raio atual: {raio}", True, (255,255,255))
     janela.blit(textoQuant, (largura - 350,10))
