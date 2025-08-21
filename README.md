@@ -22,6 +22,20 @@ Este projeto tem como objetivo encontrar o caminho ótimo entre dois pontos fixo
 
   <img width="1495" height="786" alt="image" src="https://github.com/user-attachments/assets/f78d116a-ecc7-4ed6-97b0-dbc34342ba59" />
 
+## Parte 2 - Adição dos Vértices
+
+- Para cada obstáculo gerado, são adicionados **4 vértices auxiliares**:
+  - **Cima** (x, y - raio)  
+  - **Baixo** (x, y + raio)  
+  - **Esquerda** (x - raio, y)  
+  - **Direita** (x + raio, y)  
+
+- Esses vértices são desenhados como pontos vermelhos em torno de cada obstáculo.  
+- Além disso, o programa gera uma lista com as coordenadas de todos os vértices, organizada por obstáculo.
+
+---
+
+  <img width="1000" height="535" alt="image" src="https://github.com/user-attachments/assets/9c62a6bb-87ea-4ac1-bbb5-e746dfac570b" />
 
 ## Requisitos
 
