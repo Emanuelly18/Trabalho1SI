@@ -32,8 +32,63 @@ inputD = ""
 
 # vertices dos obstaculos
 pontosObstaculos = [] 
+arestas = []
 
 pontoInicial, pontoFinal = (margem, margem), (largura - margem, altura - margem)
+
+def intersectaCirculo(p1, p2, centro, raio):
+    (x1, y1), (x2, y2) = p1, p2
+    (cx, cy) = centro
+
+    dx, dy = x2 - x1, y2 - y1
+    fx, fy = x1 - cx, y1 - cy
+
+    a = dx*dx + dy*dy
+    b = 2 * (fx*dx + fy*dy)
+    c = fx*fx + fy*fy - raio*raio
+
+    discriminante = b*b - 4*a*c
+    if discriminante < 0:
+        return False 
+
+    discriminante = math.sqrt(discriminante)
+
+    t1 = (-b - discriminante) / (2*a)
+    t2 = (-b + discriminante) / (2*a)
+
+    
+    if (0 < t1 < 1) or (0 < t2 < 1):
+        return True
+
+    return False
+
+
+
+
+def ehVisivel(p1, p2, obstaculos):
+    for o in obstaculos:
+        if intersectaCirculo(p1, p2, o["pos"], o["raio"]):
+            return False
+    return True
+
+
+def criarArestas(pontosObstaculos, obstaculos):
+    vertices = [pontoInicial, pontoFinal]
+    for pontos in pontosObstaculos:
+        vertices.extend(pontos)
+
+    arestasLocal = []
+
+    #percorre todos os pares de vértices
+    for i in range(len(vertices)):
+        for j in range(i + 1, len(vertices)):
+            v1 = vertices[i]
+            v2 = vertices[j]
+            if ehVisivel(v1, v2, obstaculos):
+                arestasLocal.append((v1, v2))
+
+    return arestasLocal
+
 
 def atualizarPontos():
     global pontoInicial, pontoFinal
@@ -116,6 +171,10 @@ while start:
                                 (x + r, y)   
                             ]
                             pontosObstaculos.append(pontos)
+                            
+                        #construir arestas
+                        arestas = criarArestas(pontosObstaculos, obstaculos)
+                        print("Arestas visíveis:", len(arestas))
                         
                         inputA = False
                 elif evento.key == pygame.K_BACKSPACE:
@@ -154,6 +213,10 @@ while start:
     for pontos in pontosObstaculos:
         for p in pontos:
             pygame.draw.circle(janela, (139,0,0), p, 4)
+            
+    # desenha arestas
+    for a in arestas:
+        pygame.draw.line(janela, (0,255,0), a[0], a[1], 1)
         
     textoQuant = fonte.render(f"Obstáculos: {len(obstaculos)} | Raio atual: {raio}", True, (255,255,255))
     janela.blit(textoQuant, (largura - 350,10))
