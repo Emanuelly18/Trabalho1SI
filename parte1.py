@@ -79,19 +79,19 @@ def criarArestas(pontosObstaculos, obstaculos):
 
     arestasLocal = []
 
-    # percorre todos os pares de vértices
+    #percorre todos os pares de vértices
     for i in range(len(vertices)):
         for j in range(i + 1, len(vertices)):
             v1 = vertices[i]
             v2 = vertices[j]
 
-            # descarta se forem do mesmo obstáculo ---
+            # descarta se forem do mesmo obstáculo
             for pontos in pontosObstaculos:
                 if v1 in pontos and v2 in pontos:
-                    # p1 e p2 pertencem ao mesmo círculo → não cria aresta
+                    #p1 e p2 pertencem ao mesmo círculo
                     break
             else:
-                # só testa visibilidade se não for do mesmo obstáculo
+                #só testa visibilidade se não for do mesmo obstáculo
                 if ehVisivel(v1, v2, obstaculos):
                     arestasLocal.append((v1, v2))
 
