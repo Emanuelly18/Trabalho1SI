@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+from collections import deque
 
 pygame.init()
 
@@ -36,6 +37,78 @@ arestas = []
 
 pontoInicial, pontoFinal = (margem, margem), (largura - margem, altura - margem)
 
+def bfsComVolta(grafo, inicio, fim, parOposto):
+    
+    fila = deque([inicio])
+    pai = {inicio: None}
+
+    while fila:
+        atual = fila.popleft()
+        if atual == fim:
+            break
+
+        
+        if atual in parOposto and pai[atual] != parOposto[atual]:
+            op = parOposto[atual]
+            if op not in pai:
+                pai[op] = atual
+                fila.append(op)
+           
+            continue
+
+        
+        vizinhos = list(grafo.get(atual, []))
+        
+        if pai[atual] is not None and pai[atual] in vizinhos:
+            vizinhos.remove(pai[atual])
+        random.shuffle(vizinhos)
+
+        for v in vizinhos:
+            if v not in pai:
+                pai[v] = atual
+                fila.append(v)
+
+    if fim not in pai:
+        return []
+
+    #reconstrói o caminho
+    caminho = []
+    n = fim
+    while n is not None:
+        caminho.append(n)
+        n = pai[n]
+    caminho.reverse()
+    return caminho
+
+def construirGrafo(arestas, parOposto):
+   
+    grafo = {}
+    def add(u, v):
+        grafo.setdefault(u, []).append(v)
+        grafo.setdefault(v, []).append(u)
+
+    for v1, v2 in arestas:
+        add(v1, v2)
+
+    
+    vistos = set()
+    for v, op in parOposto.items():
+        if (v, op) in vistos or (op, v) in vistos:
+            continue
+        add(v, op)
+        vistos.add((v, op))
+    return grafo
+
+
+def passoInterno(u, v, parOposto, obstaculos):
+    if parOposto.get(u) == v or parOposto.get(v) == u:
+        return True
+    
+    for o in obstaculos:
+        if intersectaCirculo(u, v, o["pos"], o["raio"]):
+            return True
+    return False
+
 def intersectaCirculo(p1, p2, centro, raio):
     (x1, y1), (x2, y2) = p1, p2
     (cx, cy) = centro
@@ -61,6 +134,7 @@ def intersectaCirculo(p1, p2, centro, raio):
         return True
 
     return False
+
 
 
 
@@ -158,6 +232,8 @@ def gerarObstaculos(quantidade, raio):
     return novos, raio
 
 start = True
+caminho = []
+
 while start:
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
@@ -171,21 +247,33 @@ while start:
                         obstaculos, raio = gerarObstaculos(quantObstaculos, raio)
                         
                         pontosObstaculos = [] 
+                        parOposto = {}
+                        
                         for o in obstaculos:
                             x, y, r = o["pos"][0], o["pos"][1], o["raio"]
-                            pontos = [
-                                (x, y - r),  
-                                (x, y + r),  
-                                (x - r, y),  
-                                (x + r, y)   
-                            ]
+                            topo    = (x, y - r)
+                            base    = (x, y + r)
+                            esquerda= (x - r, y)
+                            direita = (x + r, y)
+
+                            pontos = [topo, base, esquerda, direita]
                             pontosObstaculos.append(pontos)
+
+                            #mapeia pares opostos
+                            parOposto[topo] = base
+                            parOposto[base] = topo
+                            parOposto[esquerda] = direita
+                            parOposto[direita]  = esquerda
                             
                         #construir arestas
                         arestas = criarArestas(pontosObstaculos, obstaculos)
                         print("Arestas visíveis:", len(arestas))
                         
-                        
+                        #grafo para busca 
+                        grafo = construirGrafo(arestas, parOposto)
+
+                        caminho = bfsComVolta(grafo, pontoInicial, pontoFinal, parOposto)
+                        print("Caminho encontrado:", caminho)
                         
                         inputA = False
                 elif evento.key == pygame.K_BACKSPACE:
@@ -228,6 +316,14 @@ while start:
     # desenha arestas
     for a in arestas:
         pygame.draw.line(janela, (0,255,0), a[0], a[1], 1)
+        
+    # desenha caminho 
+    if caminho:
+        for i in range(len(caminho) - 1):
+            u, v = caminho[i], caminho[i+1]
+            if passoInterno(u, v, parOposto, obstaculos):
+                continue  #nao desenha
+            pygame.draw.line(janela, (0,0,255), u, v, 3)
         
     textoQuant = fonte.render(f"Obstáculos: {len(obstaculos)} | Raio atual: {raio}", True, (255,255,255))
     janela.blit(textoQuant, (largura - 350,10))
